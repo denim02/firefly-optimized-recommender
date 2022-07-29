@@ -17,22 +17,23 @@ class MovieLens:
     moviesPath = 'ml-latest-small/movies.csv'
 
     def load1Mdata(self):
-        reader = Reader(line_format='user item rating timestamp', sep='::', skip_lines=1)
-        ratingsDataset = Dataset.load_from_file('ml-1m/ratings.dat', reader=reader)
-        with open('ml-1m/movies.dat', newline='', encoding='ISO-8859-1') as datfile:
+        ratingsDataset = Dataset.load_builtin('ml-100k')
+        with open('ml-1m/u.item', newline='', encoding='ISO-8859-1') as datfile:
             for row in datfile:
-                row = row.split('::')
+                row = row.split('|')
                 movieId, movieName = int(row[0]), row[1]
                 self.movieID_to_name[movieId] = movieName
                 self.name_to_movieID[movieName] = movieId
                 del movieId, movieName
+        
+        self.parseDATFileToCSV()
         return ratingsDataset
 
     def loadData(self):
         reader = Reader(line_format='user item rating timestamp', sep=',', skip_lines=1)
         ratingsDataset = Dataset.load_from_file(self.ratingsPath, reader=reader)
         with open(self.moviesPath,newline='',encoding='ISO-8859-1') as csvfile:
-            movieReader = csv.reader(csvfile)
+            movieReader = csv.reader(csvfile, delimiter='|')
             next(movieReader)
             for row in movieReader:
                 movieId,movieName = int(row[0]),row[1]
@@ -75,6 +76,15 @@ class MovieLens:
             rankings[movieID] = rank
             rank += 1
         return rankings
+
+    def parseDATFileToCSV(self):
+        with open('ml-1m/u.data') as datfile:
+            with open('ml-latest-small/ratings.csv', 'w') as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerow(['UserID', 'MovieID', 'Rating', 'Timestamp'])
+                for row in datfile:
+                    row = row.split('\t')
+                    writer.writerow([row[0], row[1], row[2], row[3]])
 
     def getGenres(self):
         # Genres dictionary and integer coded
