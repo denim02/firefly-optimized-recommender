@@ -9,7 +9,7 @@ from EvaluatorScript import Evaluator
 
 def loadMovieLensData():
     ml = MovieLens()
-    data = ml.load1Mdata()
+    data = ml.loadData()
     rankings = ml.getPopularityRanking()
     return ml,data,rankings
 

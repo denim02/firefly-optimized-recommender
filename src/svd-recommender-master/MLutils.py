@@ -16,9 +16,9 @@ class MovieLens:
     ratingsPath = 'ml-latest-small/ratings.csv'
     moviesPath = 'ml-latest-small/movies.csv'
 
-    def load1Mdata(self):
+    def loadData(self):
         ratingsDataset = Dataset.load_builtin('ml-100k')
-        with open('ml-1m/u.item', newline='', encoding='ISO-8859-1') as datfile:
+        with open('ml-100k/u.item', newline='', encoding='ISO-8859-1') as datfile:
             for row in datfile:
                 row = row.split('|')
                 movieId, movieName = int(row[0]), row[1]
@@ -27,19 +27,6 @@ class MovieLens:
                 del movieId, movieName
         
         self.parseDATFileToCSV()
-        return ratingsDataset
-
-    def loadData(self):
-        reader = Reader(line_format='user item rating timestamp', sep=',', skip_lines=1)
-        ratingsDataset = Dataset.load_from_file(self.ratingsPath, reader=reader)
-        with open(self.moviesPath,newline='',encoding='ISO-8859-1') as csvfile:
-            movieReader = csv.reader(csvfile, delimiter='|')
-            next(movieReader)
-            for row in movieReader:
-                movieId,movieName = int(row[0]),row[1]
-                self.movieID_to_name[movieId] = movieName
-                self.name_to_movieID[movieName] = movieId
-                del movieId, movieName
         return ratingsDataset
 
     def getUserRatings(self,user):
@@ -78,57 +65,13 @@ class MovieLens:
         return rankings
 
     def parseDATFileToCSV(self):
-        with open('ml-1m/u.data') as datfile:
+        with open('ml-100k/u.data') as datfile:
             with open('ml-latest-small/ratings.csv', 'w') as csvfile:
                 writer = csv.writer(csvfile)
                 writer.writerow(['UserID', 'MovieID', 'Rating', 'Timestamp'])
                 for row in datfile:
                     row = row.split('\t')
-                    writer.writerow([row[0], row[1], row[2], row[3]])
-
-    def getGenres(self):
-        # Genres dictionary and integer coded
-        genres = defaultdict(list)
-        genreIDs = {}
-        maxGenreID = 0
-        with open(self.moviesPath,newline='',encoding='ISO-8859-1') as csvfile:
-            movieReader = csv.reader(csvfile)
-            next(movieReader)
-            for row in movieReader:
-                movieID = int(row[0])
-                genreList = row[2].split('|')
-                genreIDList = []
-                for genre in genreList:
-                    if genre in genreIDs:
-                        genreID = genreIDs[genre]
-                    else:
-                        genreID = maxGenreID
-                        genreIDs[genre] = genreID
-                        maxGenreID += 1
-                    genreIDList.append(genreID)
-                genres[movieID] = genreIDList
-
-            for (movieID,genreIDList) in genres.items():
-                onehot = [0] * maxGenreID
-                for genreID in genreIDList:
-                    onehot[genreID] = 1
-                genres[movieID] = onehot
-        return genres
-
-    def getYears(self):
-        # Year of the movie
-        years = defaultdict(int)
-        p=re.compile(r"(?:\((\d{4})\))?\s*$")
-        with open(self.moviesPath, newline='',encoding='ISO-8859-1') as csvfile:
-            movieReader = csv.reader(csvfile)
-            next(movieReader)
-            for row in movieReader:
-                movieID = int(row[0])
-                title = row[1]
-                year = p.search(title).group(1)
-                if year:
-                    years[movieID] = int(year)
-        return years
+                    writer.writerow([row[0], row[1], row[2], row[3].strip('\n')])
 
     def getMovieName(self,movieID):
         return self.movieID_to_name[movieID]
