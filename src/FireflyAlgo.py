@@ -11,25 +11,30 @@ class Firefly:
         self.intensity = 0.0
 
 class FireflyAlgo:
-    def __init__(self, data, numFireflies = 40, dimensions = 4, maxEpochs = 1000, seed = 0) -> None:
+    def __init__(self, data, params, numFireflies = 40, dimensions = 4, maxEpochs = 1000, seed = 0) -> None:
         self.numFireflies = numFireflies
         self.dimensions = dimensions
         self.maxEpochs = maxEpochs
         self.seed = seed
         self.data = data
+
+        # reg_all, n_factors, n_epochs, lr_all
+        self.minX = [params['reg_all'][0], params['n_factors'][0], params['n_epochs'][0], params['lr_all'][0]]
+        self.maxX = [params['reg_all'][1], params['n_factors'][1], params['n_epochs'][1], params['lr_all'][1]]
+
         self.trainSet, self.testSet = train_test_split(data, test_size=0.25, random_state=0)
 
-        print("Initializing Firefly Algorithm with the following parameters...\n")
+        print("\nInitializing Firefly Algorithm with the following parameters...\n")
         print("Number of fireflies:", numFireflies)
         print("Dimensions:", dimensions)
         print("Max epochs:", maxEpochs)
-        print("Seed:", seed, "\n")
-
-        
+        print("Seed:", seed)
+        print("Min values:", self.minX)
+        print("Max values:", self.maxX, "\n")
 
     def error(self, position):          # Error function checks the RMSE
         print("\nTraining model with the following parameters: ")
-        print("Reg_all:", str(round(position[0], 6)).ljust(11), "| n_factors:", str(int(position[1])).ljust(11), "| n_epochs:", str(int(position[2])).ljust(11), "| lr_all:", str(round(position[3], 6)).ljust(11))
+        print("reg_all:", str(round(position[0], 6)).ljust(10), "| n_factors:", str(int(position[1])).ljust(6), "| n_epochs:", str(int(position[2])).ljust(6), "| lr_all:", str(round(position[3], 6)).ljust(9))
         algo = SVD(reg_all=position[0],n_factors=int(position[1]),n_epochs=int(position[2]),lr_all=position[3])
         
         algo.fit(self.trainSet)
@@ -37,9 +42,6 @@ class FireflyAlgo:
         return accuracy.rmse(predictions, verbose=True)
         
     def solve(self):
-        # reg_all, n_factors, n_epochs, lr_all
-        minX = [0.01, 25, 20, 0.001]
-        maxX = [0.5, 300, 200, 0.05]
 
         B0 = 1.0
         g = 1.0
@@ -58,18 +60,21 @@ class FireflyAlgo:
             # Initialize fireflies and their positions
             swarm[i] = Firefly(self.dimensions)
             for k in range(0, self.dimensions):
-                swarm[i].position[k] = rand.uniform(minX[k], maxX[k])
+                swarm[i].position[k] = rand.uniform(self.minX[k], self.maxX[k])
             
             swarm[i].error = self.error(swarm[i].position)
             swarm[i].intensity = 1 / (swarm[i].error + 1)
             if(swarm[i].error < bestError):
                 bestError = swarm[i].error
                 bestPositions = swarm[i].position
+
+        print("-------------------------------")
         
         # Main loop
         for epoch in range(0, self.maxEpochs):
             if (epoch % displayInterval == 0):
-                print("\n", "Epoch:", str(epoch + 1).ljust(6), "Best error:", bestError)
+                print("\n-----------")
+                print("Epoch:", str(epoch + 1).ljust(6), "Best error:", bestError)
 
             for i in range(0, self.numFireflies):
                 for j in range(0, self.numFireflies):
@@ -83,8 +88,8 @@ class FireflyAlgo:
                             swarm[i].position[k] += a * (rand.random() - 0.5)
 
                             # Computed value fell outside the bounds of allowed values, therefore recompute a random value to assign
-                            if (swarm[i].position[k] < minX[k] or swarm[i].position[k] > maxX[k]):
-                                swarm[i].position[k] = rand.uniform(minX[k], maxX[k])
+                            if (swarm[i].position[k] < self.minX[k] or swarm[i].position[k] > self.maxX[k]):
+                                swarm[i].position[k] = rand.uniform(self.minX[k], self.maxX[k])
 
                 swarm[i].error = self.error(swarm[i].position)
                 swarm[i].intensity = 1 / (swarm[i].error + 1)
@@ -95,7 +100,7 @@ class FireflyAlgo:
                 for k in range(0, self.dimensions):
                     bestPositions[k] = swarm[0].position[k]
 
-        print("Best error:", bestError)
-        print("Best positions:", bestPositions, "\n")
-        return {'num_factors': int(bestPositions[1]), 'num_epochs': int(bestPositions[2]), 'reg_all': bestPositions[0], 'lr_all': bestPositions[3]}
+        print("\nBest Error:", bestError)
+        print("Best Parameters  -->  reg_all:", bestPositions[0], "| n_factors:", int(bestPositions[1]), "| n_epochs:", int(bestPositions[2]), "| lr_all:", bestPositions[3],"\n")
+        return {'reg_all': bestPositions[0], 'n_factors': int(bestPositions[1]), 'n_epochs': int(bestPositions[2]), 'lr_all': bestPositions[3]}
 

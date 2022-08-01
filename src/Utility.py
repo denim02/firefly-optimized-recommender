@@ -13,8 +13,8 @@ from surprise.model_selection import train_test_split,LeaveOneOut
 class MovieLens:
     movieID_to_name = {}
     name_to_movieID = {}
-    ratingsPath = 'ml-latest-small/ratings.csv'
-    moviesPath = 'ml-latest-small/movies.csv'
+    ratingsPath = 'ml-csv/ratings.csv'
+    moviesPath = 'ml-csv/movies.csv'
 
     def loadData(self):
         ratingsDataset = Dataset.load_builtin('ml-100k')
@@ -26,7 +26,6 @@ class MovieLens:
                 self.name_to_movieID[movieName] = movieId
                 del movieId, movieName
         
-        self.parseDATFileToCSV()
         return ratingsDataset
 
     def getUserRatings(self,user):
@@ -63,15 +62,6 @@ class MovieLens:
             rankings[movieID] = rank
             rank += 1
         return rankings
-
-    def parseDATFileToCSV(self):
-        with open('ml-100k/u.data') as datfile:
-            with open('ml-latest-small/ratings.csv', 'w') as csvfile:
-                writer = csv.writer(csvfile)
-                writer.writerow(['UserID', 'MovieID', 'Rating', 'Timestamp'])
-                for row in datfile:
-                    row = row.split('\t')
-                    writer.writerow([row[0], row[1], row[2], row[3].strip('\n')])
 
     def getMovieName(self,movieID):
         return self.movieID_to_name[movieID]

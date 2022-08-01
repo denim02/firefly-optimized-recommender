@@ -1,6 +1,6 @@
 from collections import defaultdict
-import MLmetrics as Metrics
-from MLutils import EvaluationData
+import Metrics
+from Utility import EvaluationData
 from surprise import accuracy
 import seaborn as sns
 import time
@@ -78,7 +78,7 @@ class Evaluator():
                 predictions.append(res)
                 counter += 1
             except Exception:
-                # print('Could not get prediction:', uid, iid)
+                print('Could not get prediction:', uid, iid)
                 continue
         print('Predictions made:',counter,'of',total)
         return predictions
@@ -125,7 +125,6 @@ class Evaluator():
                 predictions.append(res)
                 counter += 1
             except Exception:
-                # print('Could not get prediction:', uid, iid)
                 continue
 
         print('User predictions made:',counter,'of',total)

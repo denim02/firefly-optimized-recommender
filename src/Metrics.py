@@ -2,18 +2,6 @@ import numpy as np
 from collections import defaultdict
 import itertools
 
-''' accuracy metrics '''
-
-def MAE(predictions):
-    __, __, true_r, predict_r = list(zip(*predictions))
-    return np.mean(abs(np.array(true_r) - np.array(predict_r)))
-
-def RMSE(predictions):
-    __,__,true_r,predict_r = list(zip(*predictions))
-    return np.sqrt(np.mean(np.square(np.array(true_r)-np.array(predict_r))))
-
-''' beyond metrics - to be used with leave one out test/anti test set predictions, anti test set topN'''
-
 def HitRate(topN,predictions):
     total = 0
     hits = 0

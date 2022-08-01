@@ -1,48 +1,51 @@
-from collections import defaultdict
+from FireflyAlgo import FireflyAlgo
+from Utility import MovieLens
+from surprise import SVD, NormalPredictor, KNNBasic
+from AlgoEvaluation import Evaluator
 
-from surprise import SVD
-from surprise import Dataset
+def loadMovieLensData():
+    ml = MovieLens()
+    data = ml.loadData()
+    rankings = ml.getPopularityRanking()
+    return ml,data,rankings
 
+ml, data, rankings = loadMovieLensData()
 
-def get_top_n(predictions, n=10):
-    """Return the top-N recommendation for each user from a set of predictions.
+# SVD Hyperparameter tuning using Firefly algorithm to get smallest RMSE value
+# Will tune the reg_all, n_factors, n_epochs, lr_all parameters
+##### MODIFY HERE #####
+params = {
+    'reg_all': (0.01, 0.5),
+    'n_factors': (25, 300),
+    'n_epochs': (20, 200),
+    'lr_all': (0.001, 0.05)
+}
+fireflies = 3
+epochs = 5
 
-    Args:
-        predictions(list of Prediction objects): The list of predictions, as
-            returned by the test method of an algorithm.
-        n(int): The number of recommendation to output for each user. Default
-            is 10.
+# Find optimal hyperparameters using Firefly algorithm
+fa = FireflyAlgo(data, params, numFireflies=fireflies, maxEpochs=epochs)
+tuned_SVD_params = fa.solve()
 
-    Returns:
-    A dict where keys are user (raw) ids and values are lists of tuples:
-        [(raw item id, rating estimation), ...] of size n.
-    """
+# Build evaluation object
+eval = Evaluator(data,rankings)
 
-    # First map the predictions to each user.
-    top_n = defaultdict(list)
-    for uid, iid, true_r, est, _ in predictions:
-        top_n[uid].append((iid, est))
+print("\nRunning evaluation between tuned SVD model, untuned SVD, KNN, and Normal Predictor...\n")
 
-    # Then sort the predictions for each user and retrieve the k highest ones.
-    for uid, user_ratings in top_n.items():
-        user_ratings.sort(key=lambda x: x[1], reverse=True)
-        top_n[uid] = user_ratings[:n]
+# Build tuned SVD, untuned SVD, random models
+svdtuned = SVD(reg_all=float(tuned_SVD_params['reg_all']), n_factors=int(tuned_SVD_params['n_factors']), n_epochs=int(tuned_SVD_params['n_epochs']), lr_all=float(tuned_SVD_params['lr_all']))
+knn = KNNBasic()
+svd = SVD()
+random = NormalPredictor()
 
-    return top_n
+# Add models to evaluation object
+eval.addModel(svdtuned,'SVDtuned')
+eval.addModel(svd,'SVD')
+eval.addModel(knn,'KNN Basic')
+eval.addModel(random,'Random')
 
+# Evaluate object = fit models, build topN lists, run prediction/hitrate based metrics
+eval.evaluateModel(True)
 
-# First train an SVD algorithm on the movielens dataset.
-data = Dataset.load_builtin('ml-100k')
-trainset = data.build_full_trainset()
-algo = SVD()
-algo.fit(trainset)
-
-# Than predict ratings for all pairs (u, i) that are NOT in the training set.
-testset = trainset.build_anti_testset()
-predictions = algo.test(testset)
-
-top_n = get_top_n(predictions, n=10)
-
-# Print the recommended items for each user
-for uid, user_ratings in top_n.items():
-    print(uid, [iid for (iid, _) in user_ratings])
+# Build topN list for target user 56
+eval.sampleUser(ml)
