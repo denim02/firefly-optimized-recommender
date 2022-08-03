@@ -38,7 +38,7 @@ class Evaluator():
 
         LOOX_topN = self.getTopN(LOOXfull_predictions)
 
-        return Metrics.CumulativeHitRate(LOOX_topN, LOOX_predictions, 3.0)
+        return Metrics.HitRate(LOOX_topN, LOOX_predictions, 3.0)
 
 
     def evaluateModel(self,doTopN=False):
