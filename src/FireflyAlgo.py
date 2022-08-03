@@ -2,6 +2,7 @@ import random as rand
 from surprise import SVD
 from surprise import accuracy
 from surprise.model_selection import train_test_split
+import AlgoEvaluation as eval
 import numpy as np
 
 class Firefly:
@@ -17,6 +18,7 @@ class FireflyAlgo:
         self.maxEpochs = maxEpochs
         self.seed = seed
         self.data = data
+        self.evaluator = eval.Evaluator(data)
 
         # reg_all, n_factors, n_epochs, lr_all
         self.minX = [params['reg_all'][0], params['n_factors'][0], params['n_epochs'][0], params['lr_all'][0]]
@@ -32,14 +34,18 @@ class FireflyAlgo:
         print("Min values:", self.minX)
         print("Max values:", self.maxX, "\n")
 
-    def error(self, position):          # Error function checks the RMSE
+    def error(self, position):          # Error function checks the inverse of the hitrate of the model
         print("\nTraining model with the following parameters: ")
         print("reg_all:", str(round(position[0], 6)).ljust(10), "| n_factors:", str(int(position[1])).ljust(6), "| n_epochs:", str(int(position[2])).ljust(6), "| lr_all:", str(round(position[3], 6)).ljust(9))
         algo = SVD(reg_all=position[0],n_factors=int(position[1]),n_epochs=int(position[2]),lr_all=position[3])
         
-        algo.fit(self.trainSet)
-        predictions = algo.test(self.testSet)
-        return accuracy.rmse(predictions, verbose=True)
+        self.evaluator.addModel(algo, 'SVDtuned')
+        hitrate = self.evaluator.getModelHitRate('SVDtuned')
+        self.evaluator.clearModels()
+
+        print("Hitrate:", hitrate)
+
+        return 1 / hitrate 
         
     def solve(self):
 
@@ -47,7 +53,7 @@ class FireflyAlgo:
         g = 1.0
         a = 0.20
 
-        displayInterval = self.maxEpochs / 10
+        displayInterval = self.maxEpochs / 5
  
         # Initialize array that will contain fireflies and the result array
         bestError = np.finfo(np.float64).max
@@ -74,7 +80,7 @@ class FireflyAlgo:
         for epoch in range(0, self.maxEpochs):
             if (epoch % displayInterval == 0):
                 print("\n-----------")
-                print("Epoch:", str(epoch + 1).ljust(6), "Best error:", bestError)
+                print("Epoch:", str(epoch + 1).ljust(6), "Best hitrate:", 1 / bestError)
 
             for i in range(0, self.numFireflies):
                 for j in range(0, self.numFireflies):
@@ -100,7 +106,7 @@ class FireflyAlgo:
                 for k in range(0, self.dimensions):
                     bestPositions[k] = swarm[0].position[k]
 
-        print("\nBest Error:", bestError)
+        print("\nBest Hitrate:", 1 / bestError)
         print("Best Parameters  -->  reg_all:", bestPositions[0], "| n_factors:", int(bestPositions[1]), "| n_epochs:", int(bestPositions[2]), "| lr_all:", bestPositions[3],"\n")
         return {'reg_all': bestPositions[0], 'n_factors': int(bestPositions[1]), 'n_epochs': int(bestPositions[2]), 'lr_all': bestPositions[3]}
 

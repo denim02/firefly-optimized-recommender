@@ -16,11 +16,11 @@ ml, data, rankings = loadMovieLensData()
 ##### MODIFY HERE #####
 params = {
     'reg_all': (0.01, 0.5),
-    'n_factors': (25, 300),
-    'n_epochs': (20, 200),
+    'n_factors': (25, 100),
+    'n_epochs': (20, 100),
     'lr_all': (0.001, 0.05)
 }
-fireflies = 3
+fireflies = 5
 epochs = 5
 
 # Find optimal hyperparameters using Firefly algorithm
