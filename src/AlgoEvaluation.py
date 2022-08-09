@@ -6,7 +6,7 @@ import seaborn as sns
 import time
 
 class Evaluator():
-    def __init__(self,data,rankings):
+    def __init__(self,data,rankings = []):
         self.rankings = rankings
         self.trainSet,self.testSet,self.LOOX_trainSet,self.LOOX_testSet,self.LOOX_antitestSet, \
             self.full_trainSet,self.full_antitestSet,self.simAlgo = self.processData(data)
@@ -21,6 +21,25 @@ class Evaluator():
 
     def addModel(self,model,name):
         self.models[name] = model
+
+    def clearModels(self):
+        self.models = {}
+        self.metrics = {}
+    
+    def getModelHitRate(self, name):
+        self.models[name].fit(self.trainSet)
+
+        self.models[name].fit(self.LOOX_trainSet)
+        LOOX_predictions = self.models[name].test(self.LOOX_testSet)
+        LOOXfull_predictions = self.models[name].test(self.LOOX_antitestSet)
+
+        self.models[name].fit(self.full_trainSet)
+        full_predictions = self.models[name].test(self.full_antitestSet)
+
+        LOOX_topN = self.getTopN(LOOXfull_predictions)
+
+        return Metrics.HitRate(LOOX_topN, LOOX_predictions)
+
 
     def evaluateModel(self,doTopN=False):
         for name in self.models:
