@@ -2,3 +2,4 @@
 *.docx
 Sources
 src/__pycache__
+.DS_Store
