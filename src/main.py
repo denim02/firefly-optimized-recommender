@@ -14,18 +14,25 @@ ml, data, rankings = loadMovieLensData()
 # SVD Hyperparameter tuning using Firefly algorithm to get smallest RMSE value
 # Will tune the reg_all, n_factors, n_epochs, lr_all parameters
 ##### MODIFY HERE #####
-params = {
-    'reg_all': (0.01, 0.5),
-    'n_factors': (25, 100),
-    'n_epochs': (20, 100),
-    'lr_all': (0.001, 0.05)
-}
-fireflies = 5
-epochs = 10
+# params = {
+#     'reg_all': (0.01, 0.5),
+#     'n_factors': (25, 100),
+#     'n_epochs': (20, 100),
+#     'lr_all': (0.001, 0.05)
+# }
+# fireflies = 5
+# epochs = 10
 
-# Find optimal hyperparameters using Firefly algorithm
-fa = FireflyAlgo(data, params, numFireflies=fireflies, maxEpochs=epochs)
-tuned_SVD_params = fa.solve()
+# # Find optimal hyperparameters using Firefly algorithm
+# fa = FireflyAlgo(data, params, numFireflies=fireflies, maxEpochs=epochs)
+# tuned_SVD_params = fa.solve()
+
+tuned_SVD_params = {
+    'reg_all': 0.055446287453986845,
+    'n_factors': 86,
+    'n_epochs': 89,
+    'lr_all': 0.0022187603665117447
+}
 
 # Build evaluation object
 eval = Evaluator(data,rankings)
