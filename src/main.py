@@ -20,8 +20,8 @@ params = {
     'n_epochs': (20, 200),
     'lr_all': (0.001, 0.05)
 }
-fireflies = 3
-epochs = 5
+fireflies = 20
+epochs = 50
 
 # Find optimal hyperparameters using Firefly algorithm
 fa = FireflyAlgo(data, params, numFireflies=fireflies, maxEpochs=epochs)

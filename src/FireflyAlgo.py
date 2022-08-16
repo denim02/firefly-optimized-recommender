@@ -69,9 +69,6 @@ class FireflyAlgo:
                 bestPositions = swarm[i].position
 
         print("-------------------------------")
-
-        # The loop will automatically stop if the bestError doesn't improve by more than 0.5% after 5 iterations
-        iter_count = 0
         
         # Main loop
         for epoch in range(0, self.maxEpochs):
@@ -103,12 +100,6 @@ class FireflyAlgo:
                 bestError = swarm[0].error
                 for k in range(0, self.dimensions):
                     bestPositions[k] = swarm[0].position[k]
-            if(abs(prevBestError - bestError) < 0.005):
-                iter_count += 1
-            if(iter_count == 5):
-                print("\nAutomatically ending calculation after 5 iterations without improvement --> Epoch:", epoch)
-                print("\n-------------------------------")
-                break
                 
 
         print("\nBest Error:", bestError)
