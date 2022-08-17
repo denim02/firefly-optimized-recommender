@@ -2,6 +2,7 @@ from FireflyAlgo import FireflyAlgo
 from Utility import MovieLens
 from surprise import SVD, NormalPredictor, KNNBasic
 from AlgoEvaluation import Evaluator
+import time
 
 def loadMovieLensData():
     ml = MovieLens()
@@ -23,9 +24,16 @@ params = {
 fireflies = 20
 epochs = 50
 
+# Starting timer to measure the time taken to run the algorithm
+start = time.time()
+
 # Find optimal hyperparameters using Firefly algorithm
 fa = FireflyAlgo(data, params, numFireflies=fireflies, maxEpochs=epochs)
 tuned_SVD_params = fa.solve()
+
+# Stopping timer and printing elapsed time
+end = time.time()
+print("Time taken to run the algorithm: {} seconds".format(end - start))
 
 # Build evaluation object
 eval = Evaluator(data,rankings)
