@@ -1,41 +1,24 @@
-from FireflyAlgo import FireflyAlgo
 from Utility import MovieLens
-from surprise import SVD, NormalPredictor, KNNBasic
+from surprise import SVD, NormalPredictor
 from AlgoEvaluation import Evaluator
 
 def loadMovieLensData():
     ml = MovieLens()
-    data = ml.loadData()
-    rankings = ml.getPopularityRanking()
-    return ml,data,rankings
+    return ml.loadData()
 
-ml, data, rankings = loadMovieLensData()
+data = loadMovieLensData()
 
-# SVD Hyperparameter tuning using Firefly algorithm to get smallest RMSE value
-# Will tune the reg_all, n_factors, n_epochs, lr_all parameters
 ##### MODIFY HERE #####
-# params = {
-#     'reg_all': (0.01, 0.5),
-#     'n_factors': (25, 100),
-#     'n_epochs': (20, 100),
-#     'lr_all': (0.001, 0.05)
-# }
-# fireflies = 5
-# epochs = 10
-
-# # Find optimal hyperparameters using Firefly algorithm
-# fa = FireflyAlgo(data, params, numFireflies=fireflies, maxEpochs=epochs)
-# tuned_SVD_params = fa.solve()
-
 tuned_SVD_params = {
     'reg_all': 0.002987,
     'n_factors': 93,
     'n_epochs': 87,
     'lr_all': 0.002987
 }
+#######################
 
 # Build evaluation object
-eval = Evaluator(data,rankings)
+eval = Evaluator(data)
 
 print("\nRunning evaluation between tuned SVD model, untuned SVD, and Normal Predictor...\n")
 

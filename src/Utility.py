@@ -28,21 +28,6 @@ class MovieLens:
         
         return ratingsDataset
 
-    def getPopularityRanking(self):
-        # Popularity ranks = most rated movies
-        ratings = defaultdict(int)
-        rankings = defaultdict(int)
-        with open(self.ratingsPath,newline='') as csvfile:
-            ratingReader = csv.reader(csvfile)
-            next(ratingReader)
-            for row in ratingReader:
-                movieID = int(row[1])
-                ratings[movieID] += 1
-        rank = 1
-        for movieID, ratingCount in sorted(ratings.items(),key=lambda x:x[1],reverse=True):
-            rankings[movieID] = rank
-            rank += 1
-        return rankings
 
 class EvaluationData:
     def __init__(self,data,withSim=False):
