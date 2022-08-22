@@ -2,12 +2,12 @@
 
 To run this program, you must first install the following dependencies: numpy, cython, scikit-surprise, and seaborn
 To do so (if you have pip installed), simply run:
-```
+```sh
 pip install {package-name} {--user (Only if normal installation produces an error)}
 ```
 
 If pip cannot be found on your machine, first try executing:
-```
+```shell
 python -m pip install {package-name}    (or alternatively python3 -m pip ....)
 ```
     

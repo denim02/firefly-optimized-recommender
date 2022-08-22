@@ -28,25 +28,6 @@ class MovieLens:
         
         return ratingsDataset
 
-    def getUserRatings(self,user):
-        # All ratings for a given user, list of tuples
-        userRatings = []
-        hitUser = False
-        with open(self.ratingsPath,newline='') as csvfile:
-            ratingReader = csv.reader(csvfile)
-            next(ratingReader) # below errors without this
-            for row in ratingReader:
-                #print(row)
-                userID = int(row[0])
-                if user == userID:
-                    movieID = int(row[1])
-                    rating = float(row[2])
-                    userRatings.append((movieID,rating))
-                    hitUser = True
-                if (hitUser and (user != userID)):
-                    break
-        return userRatings
-
     def getPopularityRanking(self):
         # Popularity ranks = most rated movies
         ratings = defaultdict(int)
@@ -62,12 +43,6 @@ class MovieLens:
             rankings[movieID] = rank
             rank += 1
         return rankings
-
-    def getMovieName(self,movieID):
-        return self.movieID_to_name[movieID]
-
-    def getMovieId(self,movieName):
-        return self.name_to_movieID[movieName]
 
 class EvaluationData:
     def __init__(self,data,withSim=False):
