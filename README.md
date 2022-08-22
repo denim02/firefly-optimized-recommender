@@ -26,7 +26,7 @@ After that, to execute the script with its base settings, move into the /src dir
 python main.py
 ```
 
-*To modify the algorithm parameters, including the number of fireflies, epochs, and the tuning measure used, please open main.py and find the section marked as **MODIFY HERE**:*
+*To insert the hyper-parameters you want to test, please open main.py and find the section marked as **MODIFY HERE**:*
 ```py
 ##### MODIFY HERE #####
 tuned_SVD_params = {
