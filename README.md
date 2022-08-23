@@ -4,7 +4,7 @@
     <img src = "https://ecobnb.com/blog/app/uploads/sites/3/2016/06/08-all-that-glitters.jpg__1072x0_q85_upscale-870x490.jpg" alt = "Fireflies"  width = "500"/>
 </p>
 
-To run this program, you must first install the following dependencies: numpy, cython, and scikit-surprise
+To run this program, you must first install the following dependencies: numpy, cython, and scikit-surprise.
 To do so (if you have pip installed), simply run:
 
 ```sh
