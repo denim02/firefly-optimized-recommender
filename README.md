@@ -1,5 +1,7 @@
 # Recommender system hyper-parameter tuning using the bio-inspired Firefly metaheuristic
 
+This repository contains a research project conducted to better understand the algorithms and mechanisms that underline modern bio-inspired metaheuristic algorithms. A document containing the results of the project, formatted as a paper, is also available upon request.
+
 <p align="center">
     <img src = "https://ecobnb.com/blog/app/uploads/sites/3/2016/06/08-all-that-glitters.jpg__1072x0_q85_upscale-870x490.jpg" alt = "Fireflies"  width = "500"/>
 </p>
